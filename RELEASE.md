@@ -14,26 +14,29 @@ for why — automation/DOM-injection makes review approval unlikely).
 
 ## Cutting a release
 
-1. **Bump the version** in `extension/manifest.json` (e.g. `0.2.0` → `0.2.1`).
-   Use semver; the update checker compares these numbers.
-2. **Build the zip:**
-   ```sh
-   ./scripts/package.sh
-   ```
-   → produces `dist/voter-v<version>.zip` (contents at top level, so unzipping
-   gives a folder you can Load unpacked directly).
-3. **Create the GitHub Release:**
-   - Tag: `v<version>` (must match the manifest version; the checker strips the
-     leading `v`).
-   - Title/notes: what changed (especially adapter fixes players care about).
-   - **Attach** `dist/voter-v<version>.zip` as a release asset.
-   Or with the CLI:
+The `Makefile` wraps this. One-time: `brew install gh && gh auth login`.
+
+```sh
+make bump V=0.2.1                 # set the new version in manifest.json
+git commit -am "v0.2.1: <what changed>"
+make release NOTES="<what changed>"   # push, tag v0.2.1, publish release + zip
+```
+
+`make release` guards against the common mistakes (gh missing/unauthed,
+uncommitted changes, tag already exists), builds the zip, pushes `main`, then
+`gh release create`s the tag with the zip attached. `NOTES` is optional.
+
+Manual equivalent, if you prefer:
+
+1. **Bump the version** in `extension/manifest.json` (semver; the update checker
+   compares these numbers).
+2. **Build:** `./scripts/package.sh` → `dist/voter-v<version>.zip` (contents at
+   top level, so unzipping gives a Load-unpacked-ready folder).
+3. **Release:** tag `v<version>` (must match the manifest version), attach the zip.
    ```sh
    gh release create v<version> dist/voter-v<version>.zip \
-     --title "Voter v<version>" --notes "…"
-   ```
-
-That's it. Within ~12h (or immediately if a player clicks "Check for updates" in
+     --title "NerdServers Voter v<version>" --notes "…"
+   ``` Within ~12h (or immediately if a player clicks "Check for updates" in
 the popup) players on older versions get an "Update available" notification linking
 to the release page.
 
