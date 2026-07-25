@@ -9,10 +9,13 @@
 #
 # Release needs the GitHub CLI:  brew install gh && gh auth login
 
+SHELL := /bin/bash
+
 VERSION := $(shell grep -m1 '"version"' extension/manifest.json | sed -E 's/.*"version"[^"]*"([^"]+)".*/\1/')
 TAG     := v$(VERSION)
 ZIP     := dist/voter-v$(VERSION).zip
-NOTES   ?= Install: download the zip below, unzip it, then open chrome://extensions, enable Developer mode, and click "Load unpacked".
+# Keep this free of double quotes — it's passed through the shell as --notes "$(NOTES)".
+NOTES   ?= Install: download the zip below, unzip it, then open chrome://extensions, enable Developer mode, and Load unpacked.
 
 .PHONY: help version package release bump check clean
 
