@@ -274,6 +274,16 @@ async function driveVote(tab_id, config, run) {
         unknownStreak = 0;
         break;
       }
+      case "steam-signin": {
+        // Steam sign-in/OpenID confirm — fully user-driven (we never type a
+        // password). Focus, prompt, and wait for the redirect back off Steam.
+        await focusTab(tab_id);
+        notify("voter:steam", "Action needed", "Sign in to Steam in the vote tab to continue.");
+        await ask(tab_id, { cmd: "CLICK_SIGNIN" });
+        await waitForUrlLeave(tab_id, /steamcommunity\.com|steampowered\.com/i, 180000);
+        unknownStreak = 0;
+        break;
+      }
       case "confirmed":
         return { stage: "confirmed", confirmText: stage.confirmText || null, cooldownMs: stage.cooldownMs || null };
       case "captcha":
@@ -345,7 +355,21 @@ async function harvestLinks(config) {
   const tab = await openOrFocusDiscord(config.discord.linksChannelUrl);
   await waitForComplete(tab.id);
   const res = await ask(tab.id, { cmd: "HARVEST_LINKS", patterns: patternSources() });
-  return dedupe(res?.links || []);
+  const links = dedupe(res?.links || []);
+  if (links.length === 0) {
+    // Distinguish "not ready" from a genuinely empty channel so the user knows
+    // what to fix, instead of a vague "no links found".
+    if (res?.state === "interstitial") {
+      await focusTab(tab.id);
+      throw new Error('Discord is showing its "Open in app?" screen — click "Continue in Browser" in that tab, then run again.');
+    }
+    if (res?.state === "login" || res?.state === "unknown") {
+      await focusTab(tab.id);
+      throw new Error("You're not logged into Discord in the browser. Log in at discord.com, open the vote channel, then run again.");
+    }
+    throw new Error("No vote links found in the channel (is this the right channel, and are links posted?).");
+  }
+  return links;
 }
 
 // ---------------------------------------------------------------------------
@@ -659,6 +683,8 @@ async function ensureInjected(tabId) {
   else if (/^https:\/\/discord\.com\/oauth2\//.test(url)) files = ["content/discord-oauth.js"];
   else if (/^https:\/\/([a-z0-9-]+\.)?ark-servers\.net\//.test(url))
     files = ["content/_base.js", "content/ark-servers.js"];
+  else if (/^https:\/\/(steamcommunity\.com|[a-z0-9-]+\.steampowered\.com)\//.test(url))
+    files = ["content/steam.js"];
   if (!files) return;
   await chrome.scripting.executeScript({ target: { tabId }, files });
 }

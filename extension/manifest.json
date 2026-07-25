@@ -8,6 +8,8 @@
     "https://discord.com/*",
     "https://ark-servers.net/*",
     "https://*.ark-servers.net/*",
+    "https://steamcommunity.com/*",
+    "https://*.steampowered.com/*",
     "https://api.github.com/*"
   ],
   "background": {
@@ -37,6 +39,11 @@
     {
       "matches": ["https://discord.com/oauth2/*"],
       "js": ["content/discord-oauth.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://steamcommunity.com/openid/*", "https://steamcommunity.com/login/*"],
+      "js": ["content/steam.js"],
       "run_at": "document_idle"
     },
     {

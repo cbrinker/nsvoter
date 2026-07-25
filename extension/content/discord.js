@@ -15,12 +15,29 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 async function handle(msg) {
   switch (msg.cmd) {
     case "HARVEST_LINKS":
-      return { links: harvestLinks(msg.patterns || []) };
+      return { links: harvestLinks(msg.patterns || []), state: discordState() };
     case "CLAIM":
       return claim(msg);
     default:
       return { error: `discord adapter: unknown cmd ${msg.cmd}` };
   }
+}
+
+// What is this Discord page actually showing? Lets the background give a clear
+// message instead of a misleading "no links found" when the user isn't ready.
+function discordState() {
+  const text = document.body?.innerText || "";
+  // "Open in app?" interstitial that Discord shows for channel deep-links.
+  if (/continue in browser|open in discord|discord app detected/i.test(text)) {
+    return "interstitial";
+  }
+  // The logged-in web app has a message list container.
+  if (document.querySelector('[data-list-id^="chat-messages"], [class*="messagesWrapper"], [class*="scrollerInner"]')) {
+    return "app";
+  }
+  // Otherwise it's the login/landing page.
+  if (/log ?in|register|your place to talk|ditch/i.test(text)) return "login";
+  return "unknown";
 }
 
 // Scrape vote links from the visible message list. Grabs both real anchors and
