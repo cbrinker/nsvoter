@@ -1,0 +1,11 @@
+# Build artifacts
+dist/
+
+# OS / editor cruft
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Dev fixtures / captures (if ever added)
+fixtures/

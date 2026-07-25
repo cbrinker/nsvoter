@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "NerdServers Voter",
+  "version": "0.2.0",
+  "description": "Semi-automated voting for the NerdServers ARK cluster: harvest vote links from Discord, vote your chosen servers, then prompt /claim.",
+  "permissions": ["storage", "alarms", "notifications", "tabs", "scripting"],
+  "host_permissions": [
+    "https://discord.com/*",
+    "https://ark-servers.net/*",
+    "https://*.ark-servers.net/*",
+    "https://api.github.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "NerdServers Voter",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://discord.com/channels/*"],
+      "js": ["content/discord.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://discord.com/oauth2/*"],
+      "js": ["content/discord-oauth.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://ark-servers.net/*", "https://*.ark-servers.net/*"],
+      "js": ["content/_base.js", "content/ark-servers.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

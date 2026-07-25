@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>NerdServers Voter</h1>
+      <span id="method-badge" class="badge">discord</span>
+    </header>
+
+    <a id="update-banner" class="update-banner" href="#" target="_blank" rel="noopener" hidden></a>
+
+    <section class="actions">
+      <button id="preview" class="btn secondary">Preview (no vote)</button>
+      <button id="vote" class="btn primary">Vote now</button>
+    </section>
+
+    <section id="status" class="status">
+      <div class="muted">Loading status…</div>
+    </section>
+
+    <details class="settings" id="discovered-wrap">
+      <summary>Preferred servers</summary>
+      <div class="muted">Check the servers to prioritize (pinned ones vote first). Run
+        Preview or Rescan to discover the current links.</div>
+      <div id="discovered"></div>
+      <button id="rescan" class="btn secondary">Rescan links</button>
+    </details>
+
+    <details class="settings">
+      <summary>Settings</summary>
+
+      <label>Links channel URL
+        <input id="linksChannelUrl" type="url" placeholder="https://discord.com/channels/…" />
+      </label>
+      <label>Claim channel URL
+        <input id="claimChannelUrl" type="url" placeholder="https://discord.com/channels/…" />
+      </label>
+      <label>Claim command
+        <input id="claimCommand" type="text" placeholder="/claim" />
+      </label>
+
+      <label>Vote method
+        <select id="method">
+          <option value="discord">Discord</option>
+          <option value="steam">Steam</option>
+        </select>
+      </label>
+      <label>Click mode
+        <select id="clickMode">
+          <option value="auto">Auto (assisted fallback)</option>
+          <option value="assisted">Assisted (I click)</option>
+        </select>
+      </label>
+
+      <label>Prefer sites (comma-separated, ordered)
+        <input id="prefer" type="text" placeholder="ark-servers.net, *" />
+      </label>
+      <label>Avoid sites (comma-separated)
+        <input id="avoid" type="text" placeholder="" />
+      </label>
+      <label>How many to vote
+        <input id="count" type="number" min="1" max="10" />
+      </label>
+
+      <fieldset>
+        <legend>Notifications</legend>
+        <label class="row"><input id="notifyWindow" type="checkbox" /> When a voting window opens</label>
+        <label class="row"><input id="notifyFailure" type="checkbox" /> When a run fails</label>
+        <button id="testNotify" class="btn secondary">Send test notification</button>
+      </fieldset>
+
+      <button id="save" class="btn secondary">Save settings</button>
+      <span id="saved" class="muted"></span>
+
+      <fieldset>
+        <legend>Maintenance</legend>
+        <button id="resetCooldowns" class="btn secondary">Reset cooldowns</button>
+        <div class="muted">Clears stored vote timers if a site is wrongly showing as
+          in cooldown.</div>
+      </fieldset>
+    </details>
+
+    <section id="report" class="report"></section>
+
+    <footer class="footer">
+      <span id="version" class="muted"></span>
+      <button id="checkUpdate" class="linkbtn">Check for updates</button>
+    </footer>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
